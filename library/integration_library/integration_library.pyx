@@ -110,9 +110,9 @@ cpdef odeint_example2(double[::1] yinit, double x1, double x2, double eps,
               &a[0], &b[0], a.shape[0], example2)
 
     if verbose:
-        print 'Total steps = %ld'%(nok+nbad)
-        print 'OK    steps = %ld'%nok
-        print 'BAD   steps = %ld'%nbad
+        print('Total steps = %ld'%(nok+nbad))
+        print('OK    steps = %ld'%nok)
+        print('BAD   steps = %ld'%nbad)
 
     return np.asarray(yinit)
 
@@ -129,8 +129,8 @@ cpdef odeint(double[::1] yinit, double x1, double x2, double eps,
                   &a[0], &b[0], b.shape[0], sigma)
 
     if verbose:
-        print 'Total steps = %ld'%(nok+nbad)
-        print 'OK    steps = %ld'%nok
-        print 'BAD   steps = %ld'%nbad
+        print('Total steps = %ld'%(nok+nbad))
+        print('OK    steps = %ld'%nok)
+        print('BAD   steps = %ld'%nbad)
 
     return np.asarray(yinit)
