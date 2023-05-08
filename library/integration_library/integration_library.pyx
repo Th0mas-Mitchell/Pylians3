@@ -29,23 +29,6 @@ cdef void example2(double x, double y[], double dydx[],
 @cython.boundscheck(False)
 @cython.wraparound(False)
 @cython.cdivision(True) 
-cdef void linear(double x, double y[], double dydx[],
-                 double a[], double b[], long elements):
-
-    cdef int index
-    cdef double b_interp
-
-    if x<=a[0]:             b_interp = b[0]
-    elif x>=a[elements-1]:  b_interp = b[elements-1]
-    else:
-        index = <int>((x-a[0])/(a[elements-1]-a[0])*(elements-1))
-        b_interp = (b[index+1] - b[index])/(a[index+1]-a[index])*(x-a[index]) + b[index]
-    dydx[0] = b_interp
-
-    
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.cdivision(True) 
 cdef void sigma(double x, double y[], double dydx[],
                 double a[], double b[], long elements):
 
@@ -63,8 +46,7 @@ cdef void sigma(double x, double y[], double dydx[],
         index = <int>((logx-a[0])/(a[elements-1]-a[0])*(elements-1))
         Pk_interp = (b[index+1] - b[index])/(a[index+1]-a[index])*(logx-a[index]) + b[index]
     
-    dydx[0] = Pk_interp
-    #dydx[0] = 10**(Pk_interp)  #old method
+    dydx[0] = 10**(Pk_interp)
 
 #######################################################################
 ############### Trapezoidal rule ##############
@@ -84,7 +66,7 @@ cpdef RK4_example(double[::1] yinit, double x1, double x2, long nstep):
 
     cdef double *result      
     result =  CI.rkdumb(&yinit[0], yinit.shape[0], x1, x2, nstep,
-                        NULL, NULL, 0, example)
+	                NULL, NULL, 0, example)
     # cast pointer to cython memory view. Then memory view to numpy array
     return np.asarray(<double[:yinit.shape[0]]> result)
 
@@ -94,7 +76,7 @@ cpdef RK4_example2(double[::1] yinit, double x1, double x2, long nstep,
 
     cdef double *result      
     result =  CI.rkdumb(&yinit[0], yinit.shape[0], x1, x2, nstep,
-                        &a[0], &b[0], a.shape[0], example2)
+	                &a[0], &b[0], a.shape[0], example2)
     # cast pointer to cython memory view. Then memory view to numpy array
     return np.asarray(<double[:yinit.shape[0]]> result)
 
@@ -110,9 +92,9 @@ cpdef odeint_example1(double[::1] yinit, double x1, double x2, double eps,
               NULL, NULL, 0, example)
 
     if verbose:
-        print('Total steps = %ld'%(nok+nbad))
-        print('OK    steps = %ld'%nok)
-        print('BAD   steps = %ld'%nbad)
+        print 'Total steps = %ld'%(nok+nbad)
+        print 'OK    steps = %ld'%nok
+        print 'BAD   steps = %ld'%nbad
 
     return np.asarray(yinit)
 
@@ -128,9 +110,9 @@ cpdef odeint_example2(double[::1] yinit, double x1, double x2, double eps,
               &a[0], &b[0], a.shape[0], example2)
 
     if verbose:
-        print('Total steps = %ld'%(nok+nbad))
-        print('OK    steps = %ld'%nok)
-        print('BAD   steps = %ld'%nbad)
+        print 'Total steps = %ld'%(nok+nbad)
+        print 'OK    steps = %ld'%nok
+        print 'BAD   steps = %ld'%nbad
 
     return np.asarray(yinit)
 
@@ -142,20 +124,13 @@ cpdef odeint(double[::1] yinit, double x1, double x2, double eps,
     cdef long nok, nbad
     nok = nbad = 0
 
-    if function=='log' or function=='sigma':
+    if function=='sigma':
         CI.odeint(&yinit[0], yinit.shape[0], x1, x2, eps, h1, hmin, &nok, &nbad,
                   &a[0], &b[0], b.shape[0], sigma)
 
-    elif function=='linear':
-        CI.odeint(&yinit[0], yinit.shape[0], x1, x2, eps, h1, hmin, &nok, &nbad,
-                  &a[0], &b[0], b.shape[0], linear)
-
-    else:  raise Exception('Incorrect function!')
-        
-
     if verbose:
-        print('Total steps = %ld'%(nok+nbad))
-        print('OK    steps = %ld'%nok)
-        print('BAD   steps = %ld'%nbad)
+        print 'Total steps = %ld'%(nok+nbad)
+        print 'OK    steps = %ld'%nok
+        print 'BAD   steps = %ld'%nbad
 
     return np.asarray(yinit)
